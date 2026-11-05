@@ -36,20 +36,26 @@ class PaperPortfolio:
         if invest <= 0:
             return 0.0
         qty = invest / price
-        pos = self.positions.get(sym, {"qty": 0.0, "avg_entry_price": price})
+        pos = self.positions.get(sym, {"qty": 0.0, "avg_entry_price": price, "cost": 0.0})
         total = pos["qty"] + qty
         pos["avg_entry_price"] = (pos["qty"] * pos["avg_entry_price"] + qty * price) / total
         pos["qty"] = total
+        pos["cost"] = pos.get("cost", 0.0) + amount  # frais d'achat inclus
         self.positions[sym] = pos
         self.s["cash"] -= amount
         self.s["fees_paid"] += self.fee
         return invest
 
-    def sell_all(self, sym: str, price: float) -> float:
+    def sell_all(self, sym: str, price: float, day: str = "") -> float:
         pos = self.positions.pop(sym)
         proceeds = pos["qty"] * price - self.fee
+        cost = pos.get("cost", pos["qty"] * pos["avg_entry_price"])  # montant payé, frais d'achat inclus
         self.s["cash"] += proceeds
         self.s["fees_paid"] += self.fee
+        self.s.setdefault("realized", []).append({
+            "day": day, "symbol": sym, "qty": pos["qty"], "buy_price": pos["avg_entry_price"],
+            "sell_price": price, "cost": round(cost, 4), "proceeds": round(proceeds, 4),
+            "pnl": round(proceeds - cost, 4)})
         return proceeds
 
     def save(self) -> None:

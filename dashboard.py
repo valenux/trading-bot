@@ -1,0 +1,247 @@
+"""Page web du robot (docs/index.html), publiée sur GitHub Pages après chaque exécution."""
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).parent
+OUT = ROOT / "docs" / "index.html"
+
+
+def build(pf: dict | None, rows: list[dict]) -> None:
+    data = {"pf": pf, "trades": [r for r in rows if r.get("action") in ("BUY", "SELL")][-30:]}
+    payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
+    OUT.parent.mkdir(exist_ok=True)
+    OUT.write_text(TEMPLATE.replace("__DATA__", payload), encoding="utf-8")
+    (OUT.parent / ".nojekyll").write_text("", encoding="utf-8")
+
+
+TEMPLATE = r"""<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robot de trading</title>
+<meta name="robots" content="noindex">
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7;--surface:#fcfcfb;--border:#e4e3df;--grid:#ecebe7;
+  --text-1:#0b0b0b;--text-2:#52514e;--text-3:#77766f;
+  --s1:#2a78d6;--s2:#eb6834;--good:#0a7f0a;--good-bg:#e5f4e5;--bad:#c42f2f;--bad-bg:#fbe9e9;
+  --flat:#52514e;--flat-bg:#efeee9;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --page:#0d0d0d;--surface:#1a1a19;--border:#2e2e2c;--grid:#282826;
+  --text-1:#f0efec;--text-2:#c3c2b7;--text-3:#9a998f;
+  --s1:#3987e5;--s2:#d95926;--good:#3fc23f;--good-bg:#173017;--bad:#ef6b6b;--bad-bg:#3a1b1b;
+  --flat:#c3c2b7;--flat-bg:#2a2a28;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --page:#0d0d0d;--surface:#1a1a19;--border:#2e2e2c;--grid:#282826;
+  --text-1:#f0efec;--text-2:#c3c2b7;--text-3:#9a998f;
+  --s1:#3987e5;--s2:#d95926;--good:#3fc23f;--good-bg:#173017;--bad:#ef6b6b;--bad-bg:#3a1b1b;
+  --flat:#c3c2b7;--flat-bg:#2a2a28;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text-1);
+  font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 16px 48px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin-bottom:20px}
+h1{font-size:22px;margin:0;letter-spacing:-.01em}
+.sub{color:var(--text-2);font-size:13px}
+.pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;background:var(--flat-bg);color:var(--text-2);margin-left:8px;vertical-align:2px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+.kpi .label{color:var(--text-2);font-size:13px}
+.kpi .value{font-size:26px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:2px;letter-spacing:-.01em}
+.kpi .note{font-size:13px;color:var(--text-2);margin-top:4px;font-variant-numeric:tabular-nums}
+.delta{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;padding:1px 8px;border-radius:999px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.delta.up{color:var(--good);background:var(--good-bg)}
+.delta.down{color:var(--bad);background:var(--bad-bg)}
+.delta.flat{color:var(--flat);background:var(--flat-bg)}
+h2{font-size:16px;margin:0 0 4px}
+.section{margin-top:12px}
+.section .hint{color:var(--text-2);font-size:13px;margin:0 0 12px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--text-2);margin-bottom:6px}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:8px 10px;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.12);opacity:0;transition:opacity .1s;white-space:nowrap;z-index:2}
+.tip b{display:block;margin-bottom:2px}
+.tip .row{display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.tip i{width:10px;height:3px;border-radius:2px;display:inline-block}
+.split{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.split>div{border-top:1px solid var(--border);padding-top:10px}
+.split .label{font-size:13px;color:var(--text-2)}
+.split .v{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.tablewrap{overflow-x:auto;margin:0 -4px}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th{font-weight:500;color:var(--text-2);text-align:left;font-size:12.5px;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--grid);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.num{text-align:right}
+.sym{font-weight:600}
+.reason{white-space:normal;color:var(--text-2);min-width:220px}
+.tag{font-size:12px;font-weight:600;padding:1px 8px;border-radius:6px;background:var(--flat-bg);color:var(--text-2)}
+.empty{color:var(--text-2);font-size:14px;padding:6px 0}
+footer{color:var(--text-3);font-size:12.5px;margin-top:24px;line-height:1.6}
+@media (max-width:600px){.opt{display:none}.reason{min-width:0}}
+@media (max-width:760px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .kpi .value{font-size:22px}
+  .split{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>Robot de trading <span class="pill">Argent virtuel</span></h1></div>
+    <div class="sub" id="updated"></div>
+  </header>
+  <div id="app"></div>
+  <footer>
+    Portefeuille fictif géré automatiquement (règles de tendance + analyse IA des nouvelles),
+    aux vrais prix du marché, avec 1&nbsp;$ de frais simulés par ordre. Aucun argent réel n'est engagé.
+    Les résultats passés ne garantissent rien ; ceci n'est pas un conseil financier.
+  </footer>
+</div>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(function(){
+const D = JSON.parse(document.getElementById('data').textContent);
+const pf = D.pf, app = document.getElementById('app');
+const money = v => (v<0?'−':'') + Math.abs(v).toLocaleString('fr-CA',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' $';
+const signed = v => (v>0?'+':v<0?'−':'') + Math.abs(v).toLocaleString('fr-CA',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' $';
+const pct = v => (v>0?'+':v<0?'−':'') + Math.abs(v*100).toLocaleString('fr-CA',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' %';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dayFmt = d => new Date(d+'T12:00:00').toLocaleDateString('fr-CA',{day:'numeric',month:'short'});
+const longDay = d => new Date(d+'T12:00:00').toLocaleDateString('fr-CA',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function delta(v, text){
+  const cls = Math.abs(v) < 0.005 ? 'flat' : v > 0 ? 'up' : 'down';
+  const icon = cls==='up' ? '▲' : cls==='down' ? '▼' : '■';
+  const word = cls==='up' ? 'gain' : cls==='down' ? 'perte' : 'stable';
+  return `<span class="delta ${cls}" title="${word}"><span aria-hidden="true">${icon}</span>${text}<span class="sr" style="position:absolute;left:-9999px">(${word})</span></span>`;
+}
+
+if(!pf || !pf.history || !pf.history.length){
+  document.getElementById('updated').textContent = 'En attente de la première exécution';
+  app.innerHTML = `<div class="card"><h2>Pas encore de données</h2><p class="empty">Le robot démarre au prochain jour de bourse vers 10 h 35 (heure de Montréal). Cette page se mettra à jour toute seule après chaque exécution.</p></div>`;
+  return;
+}
+
+const start = pf.start_cash, H = pf.history, last = H[H.length-1];
+const prices = pf.last_prices || {};
+const equity = last.equity, bench = last.benchmark;
+const total = equity - start;
+const prev = H.length > 1 ? H[H.length-2].equity : start;
+const day = equity - prev;
+const realized = (pf.realized||[]).reduce((a,r)=>a+r.pnl,0);
+const positions = Object.entries(pf.positions||{}).map(([sym,p])=>{
+  const price = prices[sym] ?? p.avg_entry_price;
+  const value = p.qty*price, cost = p.cost ?? p.qty*p.avg_entry_price;
+  return {sym, qty:p.qty, avg:p.avg_entry_price, price, value, cost, pnl:value-cost, pnlPct:(value-cost)/cost};
+});
+const unrealized = positions.reduce((a,p)=>a+p.pnl,0);
+const bsym = (pf.benchmark||{}).symbol || '';
+document.getElementById('updated').textContent = 'Mis à jour le ' + longDay(last.day);
+
+let html = `<div class="kpis">
+  <div class="card kpi"><div class="label">Valeur actuelle</div><div class="value">${money(equity)}</div>
+    <div class="note">Départ : ${money(start)}</div></div>
+  <div class="card kpi"><div class="label">Gain ou perte total</div><div class="value">${signed(total)}</div>
+    <div class="note">${delta(total, pct(total/start))}</div></div>
+  <div class="card kpi"><div class="label">Dernière séance</div><div class="value">${signed(day)}</div>
+    <div class="note">${delta(day, pct(day/prev))}</div></div>
+  <div class="card kpi"><div class="label">Face à « acheter et garder »</div><div class="value">${signed(equity-bench)}</div>
+    <div class="note">${bsym} : ${money(bench)} (${pct(bench/start-1)})</div></div>
+</div>`;
+
+html += `<div class="card section"><h2>Évolution de la valeur</h2>
+  <p class="hint">Le robot comparé à l'achat de ${esc(bsym)} le premier jour, sans plus y toucher.</p>
+  <div class="legend"><span><i style="background:var(--s1)"></i>Robot</span><span><i style="background:var(--s2)"></i>Acheter et garder (${esc(bsym)})</span></div>
+  <div class="chart" id="chart"></div>
+  <div class="split">
+    <div><div class="label">Gains / pertes latents (titres détenus)</div><div class="v">${signed(unrealized)}</div></div>
+    <div><div class="label">Gains / pertes réalisés (ventes)</div><div class="v">${signed(realized)}</div></div>
+    <div><div class="label">Liquidités · frais simulés payés</div><div class="v">${money(pf.cash)} · ${money(pf.fees_paid)}</div></div>
+  </div></div>`;
+
+html += `<div class="card section"><h2>Titres détenus</h2><p class="hint">Gain ou perte « latent » : ce que rapporterait une vente au prix actuel, frais d'achat inclus.</p>`;
+html += positions.length ? `<div class="tablewrap"><table><thead><tr><th>Titre</th><th class="num opt">Quantité</th><th class="num opt">Prix d'achat</th><th class="num opt">Prix actuel</th><th class="num">Valeur</th><th class="num">Gain / perte</th></tr></thead><tbody>` +
+  positions.map(p=>`<tr><td class="sym">${esc(p.sym)}</td><td class="num opt">${p.qty.toLocaleString('fr-CA',{maximumFractionDigits:4})}</td><td class="num opt">${money(p.avg)}</td><td class="num opt">${money(p.price)}</td><td class="num">${money(p.value)}</td><td class="num">${signed(p.pnl)} ${delta(p.pnl, pct(p.pnlPct))}</td></tr>`).join('') +
+  `</tbody></table></div>` : `<p class="empty">Aucun titre détenu : le robot est entièrement en liquidités.</p>`;
+html += `</div>`;
+
+const R = (pf.realized||[]).slice().reverse();
+html += `<div class="card section"><h2>Ventes réalisées</h2><p class="hint">Résultat définitif de chaque vente, frais d'achat et de vente inclus.</p>`;
+html += R.length ? `<div class="tablewrap"><table><thead><tr><th>Date</th><th>Titre</th><th class="num opt">Prix d'achat</th><th class="num opt">Prix de vente</th><th class="num">Gain / perte</th></tr></thead><tbody>` +
+  R.map(r=>`<tr><td>${dayFmt(r.day)}</td><td class="sym">${esc(r.symbol)}</td><td class="num opt">${money(r.buy_price)}</td><td class="num opt">${money(r.sell_price)}</td><td class="num">${signed(r.pnl)} ${delta(r.pnl, pct(r.pnl/r.cost))}</td></tr>`).join('') +
+  `</tbody></table></div>` : `<p class="empty">Aucune vente pour l'instant.</p>`;
+html += `</div>`;
+
+const T = D.trades.slice().reverse().slice(0,15);
+html += `<div class="card section"><h2>Dernières décisions</h2><p class="hint">Achats et ventes du robot, avec sa raison.</p>`;
+html += T.length ? `<div class="tablewrap"><table><thead><tr><th>Date</th><th>Titre</th><th>Action</th><th class="num opt">Montant</th><th>Raison</th></tr></thead><tbody>` +
+  T.map(t=>`<tr><td>${dayFmt(t.time.slice(0,10))}</td><td class="sym">${esc(t.symbol)}</td><td><span class="tag">${t.action==='BUY'?'Achat':'Vente'}</span></td><td class="num opt">${money(+t.amount_usd)}</td><td class="reason">${esc(t.reason)}</td></tr>`).join('') +
+  `</tbody></table></div>` : `<p class="empty">Aucune transaction pour l'instant.</p>`;
+html += `</div>`;
+app.innerHTML = html;
+
+// ---- graphique avec survol ----
+const box = document.getElementById('chart');
+if(H.length < 2){ box.innerHTML = '<p class="empty">La courbe apparaîtra après deux jours de bourse.</p>'; return; }
+const tip = document.createElement('div'); tip.className='tip'; box.appendChild(tip);
+function draw(){
+  const W = Math.max(box.clientWidth, 280), Ht = W < 520 ? 220 : 280;
+  const ml = 54, mr = 12, mt = 10, mb = 26, pw = W-ml-mr, ph = Ht-mt-mb;
+  const vals = H.flatMap(h=>[h.equity,h.benchmark]);
+  let lo = Math.min(...vals), hi = Math.max(...vals), pad = Math.max((hi-lo)*.15, 1);
+  lo -= pad; hi += pad;
+  const raw = (hi-lo)/4, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1,2,5,10].map(m=>m*mag).find(s=>s>=raw);
+  lo = Math.floor(lo/step)*step; hi = Math.ceil(hi/step)*step;
+  const n = H.length, x = i => ml + pw*i/(n-1), y = v => mt + ph*(1-(v-lo)/(hi-lo));
+  let s = `<svg viewBox="0 0 ${W} ${Ht}" width="${W}" height="${Ht}" role="img" aria-label="Évolution de la valeur du robot et de acheter et garder">`;
+  for(let v=lo; v<=hi+1e-9; v+=step){
+    s += `<line x1="${ml}" x2="${W-mr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/>`+
+         `<text x="${ml-8}" y="${y(v)+4}" font-size="11" fill="var(--text-2)" text-anchor="end">${Math.round(v)} $</text>`;
+  }
+  const idx = [...new Set([0, Math.floor((n-1)/2), n-1])];
+  idx.forEach(i=>{ const a = i===0?'start':i===n-1?'end':'middle';
+    s += `<text x="${x(i)}" y="${Ht-6}" font-size="11" fill="var(--text-2)" text-anchor="${a}">${dayFmt(H[i].day)}</text>`; });
+  s += `<line x1="${ml}" x2="${W-mr}" y1="${y(start)}" y2="${y(start)}" stroke="var(--text-3)" stroke-dasharray="3 4"/>`;
+  [['benchmark','--s2'],['equity','--s1']].forEach(([k,c])=>{
+    s += `<polyline points="${H.map((h,i)=>x(i)+','+y(h[k])).join(' ')}" fill="none" stroke="var(${c})" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    s += `<circle cx="${x(n-1)}" cy="${y(H[n-1][k])}" r="4" fill="var(${c})" stroke="var(--surface)" stroke-width="2"/>`;
+  });
+  s += `<g id="hover" style="display:none"><line id="hl" y1="${mt}" y2="${mt+ph}" stroke="var(--text-3)"/>`+
+       `<circle id="h1" r="4" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><circle id="h2" r="4" fill="var(--s2)" stroke="var(--surface)" stroke-width="2"/></g>`;
+  s += `<rect x="${ml}" y="0" width="${pw}" height="${Ht}" fill="transparent" id="hit"/></svg>`;
+  box.querySelector('svg')?.remove(); box.insertAdjacentHTML('afterbegin', s);
+  const svg = box.querySelector('svg'), g = svg.querySelector('#hover');
+  function move(ev){
+    const r = svg.getBoundingClientRect(), px = (ev.touches?ev.touches[0].clientX:ev.clientX) - r.left;
+    const i = Math.max(0, Math.min(n-1, Math.round((px-ml)/pw*(n-1)))), h = H[i];
+    g.style.display=''; svg.querySelector('#hl').setAttribute('x1',x(i)); svg.querySelector('#hl').setAttribute('x2',x(i));
+    svg.querySelector('#h1').setAttribute('cx',x(i)); svg.querySelector('#h1').setAttribute('cy',y(h.equity));
+    svg.querySelector('#h2').setAttribute('cx',x(i)); svg.querySelector('#h2').setAttribute('cy',y(h.benchmark));
+    tip.innerHTML = `<b>${dayFmt(h.day)}</b><div class="row"><i style="background:var(--s1)"></i>Robot&nbsp;<strong>${money(h.equity)}</strong>&nbsp;(${pct(h.equity/start-1)})</div>`+
+      `<div class="row"><i style="background:var(--s2)"></i>${esc(bsym)}&nbsp;<strong>${money(h.benchmark)}</strong>&nbsp;(${pct(h.benchmark/start-1)})</div>`;
+    tip.style.opacity = 1;
+    const tw = tip.offsetWidth; let left = x(i) + 12; if(left + tw > W) left = x(i) - tw - 12;
+    tip.style.left = Math.max(0,left) + 'px'; tip.style.top = (mt + 4) + 'px';
+  }
+  function leave(){ g.style.display='none'; tip.style.opacity=0; }
+  const hit = svg.querySelector('#hit');
+  hit.addEventListener('mousemove', move); hit.addEventListener('touchstart', move, {passive:true});
+  hit.addEventListener('touchmove', move, {passive:true}); hit.addEventListener('mouseleave', leave); hit.addEventListener('touchend', leave);
+}
+draw(); let t; addEventListener('resize', ()=>{ clearTimeout(t); t = setTimeout(draw, 120); });
+})();
+</script>
+</body>
+</html>
+"""

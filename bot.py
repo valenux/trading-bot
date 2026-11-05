@@ -133,7 +133,7 @@ def run(cfg: dict, dry: bool, report: list[str]) -> None:
                     invested += amount
                     n_pos += 1
             elif not dry and action == "SELL":
-                amount = round(pf.sell_all(sym, price), 2)
+                amount = round(pf.sell_all(sym, price, today), 2)
                 invested -= held["market_value"]
                 n_pos -= 1
 
@@ -162,6 +162,7 @@ def run(cfg: dict, dry: bool, report: list[str]) -> None:
     if not dry:
         pf.s["last_equity"] = equity
         pf.s["last_run_day"] = today
+        pf.s["last_prices"] = {s: round(v, 4) for s, v in prices.items()}
         pf.s["history"].append({"day": today, "equity": round(equity, 2), "benchmark": round(bench_value, 2)})
         pf.save()
 

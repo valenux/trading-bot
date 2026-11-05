@@ -27,6 +27,8 @@ Le robot tourne seul sur GitHub chaque jour de bourse, vers 10 h 35 à Montréal
 
 ## Où voir les résultats
 
+- **La page web** : https://valenux.github.io/trading-bot/ (gains et pertes du portefeuille,
+  de chaque titre et de chaque vente, graphique interactif). Mise à jour après chaque exécution.
 - **En haut de cette page** : le rapport (graphique, rendement, titres détenus, dernières
   transactions), mis à jour automatiquement après chaque exécution.
 - **Onglet Actions** → la dernière exécution → résumé du jour (décisions, valeur du

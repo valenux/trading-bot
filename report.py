@@ -147,6 +147,9 @@ def update() -> None:
         text = f"{first}\n\n{block}\n{rest}"
     README.write_text(text, encoding="utf-8")
 
+    import dashboard
+    dashboard.build(pf, rows)
+
 
 if __name__ == "__main__":
     update()

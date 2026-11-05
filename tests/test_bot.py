@@ -57,7 +57,8 @@ def test_portfolio(tmp=Path("/tmp/claude-0/pf_test.json")):
     assert pf.buy("A", 50, 10.0) == 49.0            # 1 $ de frais
     assert abs(pf.positions["A"]["qty"] - 4.9) < 1e-9 and pf.cash == 50.0
     assert abs(pf.equity({"A": 20.0}) - 148.0) < 1e-9
-    assert abs(pf.sell_all("A", 20.0) - 97.0) < 1e-9  # 98 - 1 $ de frais
+    assert abs(pf.sell_all("A", 20.0, "2026-11-06") - 97.0) < 1e-9  # 98 - 1 $ de frais
+    assert abs(pf.s["realized"][0]["pnl"] - 47.0) < 1e-9          # 97 reçus - 50 payés
     assert abs(pf.cash - 147.0) < 1e-9 and pf.s["fees_paid"] == 2.0
     pf.save()
     assert PaperPortfolio(tmp, 100.0, 1.0).cash == pf.cash

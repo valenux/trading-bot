@@ -12,9 +12,6 @@ on:
         type: boolean
         default: false
 
-permissions:
-  contents: write   # pour enregistrer journal.csv et portfolio.json dans le dépôt
-
 concurrency:
   group: trading-bot
   cancel-in-progress: false
@@ -23,6 +20,8 @@ jobs:
   run:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write   # pour enregistrer le journal, le portefeuille et la page dans le dépôt
     steps:
       - uses: actions/checkout@v5
 
@@ -44,13 +43,37 @@ jobs:
             python bot.py
           fi
 
-      - name: Enregistrer le journal
+      - name: Enregistrer les résultats
         if: always()
         run: |
-          if [ -n "$(git status --porcelain journal.csv portfolio.json README.md rapport 2>/dev/null)" ]; then
+          FILES="journal.csv portfolio.json README.md rapport docs"
+          if [ -n "$(git status --porcelain $FILES 2>/dev/null)" ]; then
             git config user.name "trading-bot"
             git config user.email "trading-bot@users.noreply.github.com"
-            git add $(ls -d journal.csv portfolio.json README.md rapport 2>/dev/null)
-            git commit -m "Journal du $(date -u +%Y-%m-%d)"
+            git add $(ls -d $FILES 2>/dev/null)
+            git commit -m "Résultats du $(date -u +%Y-%m-%d)"
             git push
           fi
+
+  page:
+    # Publie la page web (dossier docs/) sur GitHub Pages.
+    # Réglage requis une fois : Settings → Pages → Source : « GitHub Actions ».
+    needs: run
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}   # dernière version, résultats du jour inclus
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: docs
+      - id: deploy
+        uses: actions/deploy-pages@v4
