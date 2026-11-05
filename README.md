@@ -3,7 +3,30 @@
 <!-- RAPPORT:DEBUT -->
 ## 📊 Rapport
 
-_Le rapport apparaîtra après la première exécution du robot (chaque jour de bourse vers 10 h 35, heure de Montréal)._
+_Mis à jour le 2026-11-05 · portefeuille fictif de départ : 100.00 $_
+
+![Évolution du portefeuille](rapport/evolution.svg)
+
+| | Valeur | Rendement |
+|---|---:|---:|
+| **Robot** | 99.00 $ | -1.00% |
+| Acheter et garder (SPYM) | 100.00 $ | +0.00% |
+| **Écart** | -1.00 $ | |
+
+Liquidités : 50.00 $ · Frais simulés payés : 1.00 $
+
+**Titres détenus**
+
+| Titre | Quantité | Prix d'achat moyen |
+|---|---:|---:|
+| SCHD | 1.3834 | 35.42 $ |
+
+**Dernières transactions**
+
+| Date | Titre | Action | Montant | Raison |
+|---|---|---|---:|---|
+| 2026-11-05 | SCHD | Achat | 49.00 $ | tendance haussière, RSI non suracheté + IA +0.15 |
+
 <!-- RAPPORT:FIN -->
 
 > ⚠️ Outil expérimental et éducatif. Le robot joue avec **100 $ virtuels** aux vrais prix
