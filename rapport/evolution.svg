@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" width="760" height="320" role="img" aria-label="Évolution du portefeuille du robot comparée à acheter et garder"><style>
+  .bg{fill:#fcfcfb}.t1{fill:#0b0b0b}.t2{fill:#52514e}.grid{stroke:#e4e3df}
+  .s1{stroke:#2a78d6}.f1{fill:#2a78d6}.s2{stroke:#eb6834}.f2{fill:#eb6834}.ring{stroke:#fcfcfb}
+  @media (prefers-color-scheme: dark){
+    .bg{fill:#1a1a19}.t1{fill:#f0efec}.t2{fill:#c3c2b7}.grid{stroke:#353533}
+    .s1{stroke:#3987e5}.f1{fill:#3987e5}.s2{stroke:#d95926}.f2{fill:#d95926}.ring{stroke:#1a1a19}}
+  text{font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif}
+</style><rect class="bg" width="760" height="320" rx="8"/><text class="t1" x="56" y="24" font-size="15" font-weight="600">Valeur du portefeuille fictif (USD)</text><text class="t2" x="380.0" y="160.0" font-size="14" text-anchor="middle">Le graphique apparaîtra après deux jours de bourse.</text></svg>

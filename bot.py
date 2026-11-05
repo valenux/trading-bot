@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 import yaml
 
 import market
+import report as report_mod
 from ai_analyst import ai_score
 from portfolio import PaperPortfolio
 from strategy import rule_signal
@@ -180,6 +181,11 @@ def main() -> None:
     except Exception as e:
         report.append(f"ERREUR : {e}")
         failed = True
+    if not dry:
+        try:
+            report_mod.update()
+        except Exception as e:
+            report.append(f"(rapport non mis à jour : {e})")
     write_summary(report)
     if failed:
         sys.exit(1)

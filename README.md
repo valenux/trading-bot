@@ -1,5 +1,11 @@
 # Robot de trading hybride (règles + IA) — portefeuille fictif sur GitHub Actions
 
+<!-- RAPPORT:DEBUT -->
+## 📊 Rapport
+
+_Le rapport apparaîtra après la première exécution du robot (chaque jour de bourse vers 10 h 35, heure de Montréal)._
+<!-- RAPPORT:FIN -->
+
 > ⚠️ Outil expérimental et éducatif. Le robot joue avec **100 $ virtuels** aux vrais prix
 > du marché : aucun courtier, aucun argent réel. Ses résultats passés ne garantissent rien.
 
@@ -21,6 +27,8 @@ Le robot tourne seul sur GitHub chaque jour de bourse, vers 10 h 35 à Montréal
 
 ## Où voir les résultats
 
+- **En haut de cette page** : le rapport (graphique, rendement, titres détenus, dernières
+  transactions), mis à jour automatiquement après chaque exécution.
 - **Onglet Actions** → la dernière exécution → résumé du jour (décisions, valeur du
   portefeuille comparée à « acheter et garder »).
 - **`journal.csv`** : toutes les décisions, avec leur raison.

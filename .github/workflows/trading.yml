@@ -47,10 +47,10 @@ jobs:
       - name: Enregistrer le journal
         if: always()
         run: |
-          if [ -n "$(git status --porcelain journal.csv portfolio.json 2>/dev/null)" ]; then
+          if [ -n "$(git status --porcelain journal.csv portfolio.json README.md rapport 2>/dev/null)" ]; then
             git config user.name "trading-bot"
             git config user.email "trading-bot@users.noreply.github.com"
-            git add $(ls journal.csv portfolio.json 2>/dev/null)
+            git add $(ls -d journal.csv portfolio.json README.md rapport 2>/dev/null)
             git commit -m "Journal du $(date -u +%Y-%m-%d)"
             git push
           fi
