@@ -82,7 +82,15 @@ def run(cfg: dict, dry: bool, report: list[str]) -> None:
 
     watch = [s.upper() for s in cfg["watchlist"]]
     bench_sym = cfg["benchmark"].upper()
-    closes = {sym: market.daily_closes(sym) for sym in dict.fromkeys(watch + [bench_sym])}
+    closes = {bench_sym: market.daily_closes(bench_sym)}  # la référence est indispensable
+    for sym in watch:
+        if sym in closes:
+            continue
+        try:
+            closes[sym] = market.daily_closes(sym)
+        except Exception as e:  # un symbole invalide ne bloque pas les autres
+            report.append(f"{sym}: ignoré – {e}")
+    watch = [s for s in watch if s in closes]
 
     last_day = closes[bench_sym].index[-1].date().isoformat()
     if last_day != today and not dry:

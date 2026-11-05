@@ -19,11 +19,11 @@ min_order_usd: 10.0         # pas d'achat sous ce montant (les frais mangeraient
 sim_fee_usd: 1.0
 
 # Référence de comparaison « acheter et garder » (FNB S&P 500)
-benchmark: "SPLG"
+benchmark: "SPYM"
 
 # --- Liste de titres surveillés (EXEMPLES à adapter, pas une recommandation) ---
 watchlist:
-  - SPLG
+  - SPYM
   - SCHD
   - QQQM
 
