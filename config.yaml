@@ -1,21 +1,25 @@
 # ============================================================
-#  Configuration du robot de trading (mode SIMULATION par défaut)
+#  Configuration du robot de trading — portefeuille FICTIF
+#  (aucun courtier, aucun argent réel : le robot joue avec 100 $ virtuels
+#   aux vrais prix du marché)
 # ============================================================
 
-# --- Sécurité ---
-# false = le robot utilise UNIQUEMENT le compte de simulation Alpaca (paper).
-# Passer à true branche le robot sur de l'ARGENT RÉEL : ta décision, pas avant
-# plusieurs semaines de résultats en simulation.
-allow_live_trading: false
-dry_run: false        # true = analyse et journalise, mais n'envoie AUCUN ordre
+dry_run: false        # true = analyse seulement, rien n'est acheté, vendu ni enregistré
 
 # --- Budget et limites de risque ---
-budget: 100.0               # montant maximal que le robot peut investir (USD)
+budget: 100.0               # capital fictif de départ et montant max investi (USD)
 max_position_pct: 0.50      # max 50 % du budget dans un seul titre
 max_positions: 2            # nombre maximal de titres détenus en même temps
-max_daily_loss_pct: 0.05    # aucune action si le compte a perdu 5 % depuis la veille
+max_daily_loss_pct: 0.05    # aucune action si le portefeuille a perdu 5 % depuis la veille
 stop_loss_pct: 0.10         # vend un titre qui a perdu 10 % depuis l'achat
-min_order_usd: 1.0          # Alpaca exige au moins 1 $ par ordre fractionnaire
+min_order_usd: 10.0         # pas d'achat sous ce montant (les frais mangeraient tout)
+
+# Frais simulés par ordre, pour un test honnête.
+# Ordre de grandeur d'un courtier canadien comme Interactive Brokers : ~1 $ par ordre.
+sim_fee_usd: 1.0
+
+# Référence de comparaison « acheter et garder » (FNB S&P 500)
+benchmark: "SPLG"
 
 # --- Liste de titres surveillés (EXEMPLES à adapter, pas une recommandation) ---
 watchlist:

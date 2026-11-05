@@ -8,12 +8,12 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Analyse seulement, sans passer d'ordres"
+        description: "Analyse seulement (rien n'est acheté, vendu ni enregistré)"
         type: boolean
-        default: true
+        default: false
 
 permissions:
-  contents: write   # pour enregistrer journal.csv dans le dépôt
+  contents: write   # pour enregistrer journal.csv et portfolio.json dans le dépôt
 
 concurrency:
   group: trading-bot
@@ -36,8 +36,6 @@ jobs:
 
       - name: Lancer le robot
         env:
-          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
-          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
@@ -49,10 +47,10 @@ jobs:
       - name: Enregistrer le journal
         if: always()
         run: |
-          if [ -f journal.csv ] && [ -n "$(git status --porcelain journal.csv)" ]; then
+          if [ -n "$(git status --porcelain journal.csv portfolio.json 2>/dev/null)" ]; then
             git config user.name "trading-bot"
             git config user.email "trading-bot@users.noreply.github.com"
-            git add journal.csv
+            git add $(ls journal.csv portfolio.json 2>/dev/null)
             git commit -m "Journal du $(date -u +%Y-%m-%d)"
             git push
           fi

@@ -1,11 +1,10 @@
-# Robot de trading hybride (règles + IA) — Alpaca + GitHub Actions
+# Robot de trading hybride (règles + IA) — portefeuille fictif sur GitHub Actions
 
-> ⚠️ Outil expérimental. Aucun gain n'est garanti et tu peux perdre la totalité
-> de l'argent investi. Le robot fonctionne en **simulation** (argent fictif) tant que
-> `allow_live_trading` est à `false` dans `config.yaml`.
+> ⚠️ Outil expérimental et éducatif. Le robot joue avec **100 $ virtuels** aux vrais prix
+> du marché : aucun courtier, aucun argent réel. Ses résultats passés ne garantissent rien.
 
-Le robot tourne tout seul sur GitHub chaque jour de bourse, vers 10 h 35 à Montréal.
-Ton ordinateur n'a pas besoin d'être allumé.
+Le robot tourne seul sur GitHub chaque jour de bourse, vers 10 h 35 à Montréal
+(11 h 35 l'été). Ton ordinateur n'a pas besoin d'être allumé, et aucun compte de courtage n'est nécessaire.
 
 ## Comment il décide
 
@@ -15,59 +14,50 @@ Ton ordinateur n'a pas besoin d'être allumé.
 2. **IA (Claude)** : elle lit les nouvelles récentes du titre et donne un score de -1 à 1.
    Elle **confirme ou bloque** un achat, et peut forcer une vente si le signal est très négatif.
    Elle ne peut jamais acheter seule.
-3. **Garde-fous** : budget de 100 $, max 50 % par titre, max 2 titres, stop-loss à 10 %,
-   et aucune action si le compte a perdu 5 % depuis la veille.
+3. **Garde-fous** : max 50 % par titre, max 2 titres, stop-loss à 10 %, et pause
+   d'un jour si le portefeuille a perdu 5 % depuis la veille.
+4. **Test honnête** : 1 $ de frais simulés par ordre (ordre de grandeur d'un courtier canadien),
+   et comparaison permanente avec « acheter et garder » un FNB S&P 500.
 
-Alpaca permet d'acheter des **fractions d'action** sans commission, donc 100 $ suffit.
+## Où voir les résultats
 
-Chaque décision est enregistrée dans `journal.csv` (mis à jour automatiquement dans le dépôt),
-et le résumé de chaque exécution s'affiche dans l'onglet **Actions**.
+- **Onglet Actions** → la dernière exécution → résumé du jour (décisions, valeur du
+  portefeuille comparée à « acheter et garder »).
+- **`journal.csv`** : toutes les décisions, avec leur raison.
+- **`portfolio.json`** : le portefeuille fictif et l'historique de sa valeur, jour par jour.
 
-## Mise en route (une seule fois, ~10 minutes)
+## Mise en route
 
-### 1. Compte de simulation Alpaca
-1. Crée un compte sur alpaca.markets (un courriel suffit pour la simulation).
-2. Dans le tableau de bord, vérifie que tu es en mode **Paper**.
-3. Recommandé : *Reset* du compte paper avec un solde de **100 $**, pour que la simulation
-   ressemble à ton vrai test.
-4. Menu **API Keys** → *Generate New Keys*. Copie la **Key** et le **Secret**
-   (le secret ne s'affiche qu'une fois).
+### 1. Clé IA (optionnelle mais recommandée)
+console.anthropic.com → **API Keys** → *Create Key*, puis ajoute quelques dollars de crédit
+(le coût est de quelques sous par jour). Sans clé, le robot fonctionne avec les règles seulement.
 
-### 2. Clé IA (optionnelle mais recommandée)
-console.anthropic.com → **API Keys** → *Create Key*. Ajoute quelques dollars de crédit.
-Le coût est de quelques sous par jour. Sans cette clé, le robot fonctionne avec les règles seulement.
+Dans le dépôt : **Settings** → **Secrets and variables** → **Actions** →
+*New repository secret* → nom `ANTHROPIC_API_KEY`, valeur = ta clé.
 
-### 3. Ajouter les secrets dans GitHub
-Dépôt → **Settings** → **Secrets and variables** → **Actions** → *New repository secret*.
-Crée ces trois secrets :
+### 2. Premier essai
+Onglet **Actions** → *Robot de trading* → **Run workflow** → Run.
+Coche *dry_run* pour simplement voir l'analyse, sans rien enregistrer.
 
-| Nom | Valeur |
-|---|---|
-| `ALPACA_API_KEY` | la Key Alpaca |
-| `ALPACA_SECRET_KEY` | le Secret Alpaca |
-| `ANTHROPIC_API_KEY` | la clé Anthropic |
+C'est tout : ensuite, il tourne seul chaque jour de semaine.
 
-### 4. Premier test
-Onglet **Actions** → *Robot de trading* → **Run workflow** (laisse *dry_run* coché) → Run.
-Ouvre l'exécution pour lire le résumé. Si tout est vert, c'est prêt : il tournera seul
-chaque jour de semaine.
+## Passer à l'argent réel plus tard
 
-## Passer à l'argent réel (ta décision, pas avant plusieurs semaines de simulation)
-
-1. Compare `journal.csv` et la valeur du compte paper à un simple « acheter et garder » sur la même période.
-2. Vérifie qu'Alpaca accepte un compte réel pour ta situation (résidence au Canada).
-3. Remplace les secrets par les clés du compte **réel** et mets `allow_live_trading: true`
-   dans `config.yaml`.
+Après plusieurs semaines, compare la ligne « Robot » à « Acheter et garder ».
+Si tu veux aller plus loin, l'étape suivante serait de brancher un courtier qui accepte
+les résidents canadiens et offre une API, comme Interactive Brokers.
+C'est une décision à prendre en connaissance de cause, pas une suite automatique.
 
 ## Personnaliser
 
 Tout se règle dans `config.yaml` : la liste de titres (simples exemples, pas des
-recommandations), le budget, les limites et les seuils de l'IA.
-Pour arrêter le robot : Actions → *Robot de trading* → « ⋯ » → **Disable workflow**.
+recommandations), le budget, les frais simulés, les limites et les seuils de l'IA.
+Pour **recommencer à zéro**, supprime `portfolio.json` et `journal.csv`.
+Pour **arrêter** le robot : Actions → *Robot de trading* → « ⋯ » → **Disable workflow**.
 
-## Tests (aucune clé nécessaire)
+## Tests (aucune clé ni connexion nécessaire)
 
 ```bash
-pip install -r requirements.txt numpy
+pip install -r requirements.txt
 python tests/test_bot.py
 ```
