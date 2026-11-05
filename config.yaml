@@ -1,0 +1,41 @@
+# ============================================================
+#  Configuration du robot de trading (mode SIMULATION par défaut)
+# ============================================================
+
+# --- Sécurité ---
+# false = le robot utilise UNIQUEMENT le compte de simulation Alpaca (paper).
+# Passer à true branche le robot sur de l'ARGENT RÉEL : ta décision, pas avant
+# plusieurs semaines de résultats en simulation.
+allow_live_trading: false
+dry_run: false        # true = analyse et journalise, mais n'envoie AUCUN ordre
+
+# --- Budget et limites de risque ---
+budget: 100.0               # montant maximal que le robot peut investir (USD)
+max_position_pct: 0.50      # max 50 % du budget dans un seul titre
+max_positions: 2            # nombre maximal de titres détenus en même temps
+max_daily_loss_pct: 0.05    # aucune action si le compte a perdu 5 % depuis la veille
+stop_loss_pct: 0.10         # vend un titre qui a perdu 10 % depuis l'achat
+min_order_usd: 1.0          # Alpaca exige au moins 1 $ par ordre fractionnaire
+
+# --- Liste de titres surveillés (EXEMPLES à adapter, pas une recommandation) ---
+watchlist:
+  - SPLG
+  - SCHD
+  - QQQM
+
+# --- Stratégie à règles ---
+rules:
+  sma_fast: 50
+  sma_slow: 200
+  rsi_period: 14
+  rsi_overbought: 70     # n'achète pas au-dessus
+  rsi_oversold: 30
+
+# --- Analyse IA (Claude via l'API Anthropic) ---
+ai:
+  enabled: true
+  model: "claude-sonnet-5-5"
+  # L'IA sert de confirmation / veto : elle ne peut PAS acheter seule.
+  min_score_to_buy: 0.0      # score IA entre -1 et 1 ; achat seulement si >= ce seuil
+  sell_if_score_below: -0.6  # vend si l'IA voit un signal très négatif
+  max_headlines: 10
