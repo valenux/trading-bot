@@ -72,7 +72,7 @@ jobs:
       id-token: write
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url || steps.retry.outputs.page_url }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -81,4 +81,10 @@ jobs:
         with:
           path: docs
       - id: deploy
+        uses: actions/deploy-pages@v4
+        continue-on-error: true      # GitHub Pages échoue parfois sans raison : on réessaie
+      - if: steps.deploy.outcome == 'failure'
+        run: sleep 60
+      - id: retry
+        if: steps.deploy.outcome == 'failure'
         uses: actions/deploy-pages@v4
