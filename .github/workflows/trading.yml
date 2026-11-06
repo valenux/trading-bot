@@ -2,9 +2,14 @@ name: Robot de trading
 
 on:
   schedule:
-    # Chaque jour de semaine à 15 h 35 UTC
-    # (= 10 h 35 à Montréal en hiver, 11 h 35 en été ; le marché ouvre à 9 h 30)
-    - cron: "35 15 * * 1-5"
+    # Chaque jour de semaine, heures UTC (Montréal = UTC-5 en hiver, UTC-4 en été).
+    # GitHub ne garantit pas les horaires : il peut retarder ou sauter une exécution.
+    # Les créneaux suivants servent de secours ; le robot ne joue qu'une fois par jour
+    # (les exécutions suivantes s'arrêtent sur « Déjà exécuté aujourd'hui »).
+    - cron: "35 15 * * 1-5"   # 10 h 35 (hiver)
+    - cron: "17 17 * * 1-5"   # 12 h 17 (secours)
+    - cron: "43 18 * * 1-5"   # 13 h 43 (secours)
+    - cron: "11 20 * * 1-5"   # 15 h 11 (dernier secours, avant la fermeture de 16 h)
   workflow_dispatch:
     inputs:
       dry_run:
