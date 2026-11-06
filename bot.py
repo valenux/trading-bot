@@ -110,6 +110,8 @@ def run(cfg: dict, dry: bool, report: list[str]) -> None:
         return
 
     invested = sum(p["qty"] * prices[s] for s, p in pf.positions.items())
+    # Le budget suit la valeur du portefeuille : les gains sont réinvestis (cf. backtest)
+    run_cfg = {**cfg, "budget": equity}
     n_pos = len(pf.positions)
 
     for sym in watch:
@@ -123,7 +125,7 @@ def run(cfg: dict, dry: bool, report: list[str]) -> None:
             if rule["signal"] == "BUY" or held:
                 ai = ai_score(sym, rule, market.headlines(sym, cfg["ai"]["max_headlines"]), cfg["ai"])
 
-            action, amount, reason = decide(sym, rule, ai, held, cfg, invested, n_pos)
+            action, amount, reason = decide(sym, rule, ai, held, run_cfg, invested, n_pos)
 
             if not dry and action == "BUY":
                 amount = round(pf.buy(sym, amount, price), 2)

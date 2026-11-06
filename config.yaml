@@ -7,7 +7,7 @@
 dry_run: false        # true = analyse seulement, rien n'est acheté, vendu ni enregistré
 
 # --- Budget et limites de risque ---
-budget: 100.0               # capital fictif de départ et montant max investi (USD)
+budget: 100.0               # capital fictif de départ (USD) ; ensuite le budget suit la valeur du portefeuille
 max_position_pct: 0.50      # max 50 % du budget dans un seul titre
 max_positions: 2            # nombre maximal de titres détenus en même temps
 max_daily_loss_pct: 0.05    # aucune action si le portefeuille a perdu 5 % depuis la veille
