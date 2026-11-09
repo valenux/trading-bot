@@ -5,3 +5,6 @@ time,symbol,action,amount_usd,price,rule,ai_score,reason
 2026-11-06T18:07:15+00:00,SPYM,HOLD,0.0,86.76,HOLD,0.0,pas de signal clair
 2026-11-06T18:07:17+00:00,SCHD,HOLD,0.0,35.26,BUY,0.15,"tendance haussière, RSI non suracheté"
 2026-11-06T18:07:17+00:00,QQQM,HOLD,0.0,270.32,SELL,0.0,tendance baissière (prix ou SMA rapide sous SMA lente)
+2026-11-09T16:14:48+00:00,SPYM,HOLD,0.0,88.28,HOLD,0.0,pas de signal clair
+2026-11-09T16:14:50+00:00,SCHD,HOLD,0.0,35.55,BUY,0.15,"tendance haussière, RSI non suracheté"
+2026-11-09T16:14:50+00:00,QQQM,HOLD,0.0,278.38,SELL,0.0,tendance baissière (prix ou SMA rapide sous SMA lente)
