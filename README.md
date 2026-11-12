@@ -3,15 +3,15 @@
 <!-- RAPPORT:DEBUT -->
 ## 📊 Rapport
 
-_Mis à jour le 2026-11-11 · portefeuille fictif de départ : 100.00 $_
+_Mis à jour le 2026-11-12 · portefeuille fictif de départ : 100.00 $_
 
 ![Évolution du portefeuille](rapport/evolution.svg)
 
 | | Valeur | Rendement |
 |---|---:|---:|
-| **Robot** | 99.83 $ | -0.17% |
-| Acheter et garder (SPYM) | 103.62 $ | +3.62% |
-| **Écart** | -3.79 $ | |
+| **Robot** | 99.71 $ | -0.29% |
+| Acheter et garder (SPYM) | 103.28 $ | +3.28% |
+| **Écart** | -3.57 $ | |
 
 Liquidités : 50.00 $ · Frais simulés payés : 1.00 $
 
