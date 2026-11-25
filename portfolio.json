@@ -14,8 +14,8 @@
     "start_price": 86.30000305175781,
     "start_day": "2026-11-05"
   },
-  "last_equity": 98.26680006978893,
-  "last_run_day": "2026-11-24",
+  "last_equity": 98.82016189308939,
+  "last_run_day": "2026-11-25",
   "history": [
     {
       "day": "2026-11-05",
@@ -86,11 +86,16 @@
       "day": "2026-11-24",
       "equity": 98.27,
       "benchmark": 98.04
+    },
+    {
+      "day": "2026-11-25",
+      "equity": 98.82,
+      "benchmark": 97.76
     }
   ],
   "last_prices": {
-    "SPYM": 84.61,
-    "SCHD": 34.89,
-    "QQQM": 262.78
+    "SPYM": 84.37,
+    "SCHD": 35.29,
+    "QQQM": 261.05
   }
 }
